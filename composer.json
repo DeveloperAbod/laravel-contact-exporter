@@ -1,0 +1,43 @@
+{
+    "name": "developerabod/laravel-contact-exporter",
+    "description": "A Laravel package to efficiently manage and export contacts as vCard (.vcf) files.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Developerabod\\LaravelContactExporter\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Developer Abod",
+            "email": "abodi.alwosabi12@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^10|^11|^12",
+        "illuminate/database": "^10|^11|^12"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.18",
+        "orchestra/testbench": "^8.0 || ^9.0 || ^10.0",
+        "pestphp/pest": "^3.5"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Developerabod\\LaravelContactExporter\\Providers\\VCardServiceProvider"
+            ],
+            "aliases": {
+                "VCard": "Developerabod\\LaravelContactExporter\\Facades\\VCard"
+            }
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
