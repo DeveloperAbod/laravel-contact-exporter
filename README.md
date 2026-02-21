@@ -1,63 +1,89 @@
-<div dir="rtl">
+<div align="center">
 
-# Laravel Contact Exporter
+# 📇 Laravel Contact Exporter
 
-باكج Laravel لتصدير جهات الاتصال من قاعدة البيانات بصيغة vCard (`.vcf`) بشكل احترافي وسهل.
+**A Laravel package to export database contacts as vCard (`.vcf`) files — clean, professional, and effortless.**
 
----
-
-## المميزات
-
-- تصدير جهات الاتصال كملف `.vcf` جاهز للاستيراد في أي هاتف
-- دعم كامل للأسماء العربية
-- قراءة البيانات بـ chunk لتوفير الذاكرة مع الملايين من السجلات
-- دعم Eloquent Model و DB::table بشكل مباشر
-- Fluent API سهل وسريع
-- قابل للتخصيص الكامل بدون تعديل الكود
-
----
-
-## التثبيت
+[![PHP](https://img.shields.io/badge/PHP-%5E8.3-blue?style=flat-square&logo=php)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012-red?style=flat-square&logo=laravel)](https://laravel.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
 
 ```bash
 composer require developerabod/laravel-contact-exporter
 ```
 
-نشر ملف الإعدادات:
+</div>
+
+---
+
+## ✨ Features
+
+- 📱 Export contacts as a `.vcf` file ready to import on any smartphone
+- 🌍 Full Arabic name support with UTF-8 charset
+- 🚀 Chunked database reading — memory-safe with millions of records
+- 🔌 Works with both **Eloquent Models** and **`DB::table`** queries
+- 🧩 Clean **Fluent API** — intuitive and expressive
+- ⚙️ Fully configurable without touching the package source code
+
+---
+
+## 📦 Installation
+
+### Step 1 — Install via Composer
+
+```bash
+composer require developerabod/laravel-contact-exporter
+```
+
+### Step 2 — Publish the Config File
 
 ```bash
 php artisan vendor:publish --tag=vcard-exporter-config
 ```
 
+This creates the file: `config/vcard-exporter.php`
+
 ---
 
-## الإعداد
+## ⚙️ Configuration
 
-بعد النشر ستجد الملف في `config/vcard-exporter.php`، افتحه وربط أعمدة جدولك:
+Open `config/vcard-exporter.php` and map each config key to the actual column name in your database table:
 
 ```php
-'table' => 'contacts', // اسم جدولك في قاعدة البيانات
+return [
 
-'columns' => [
-    'first_name'   => 'first_name', // اسم العمود في جدولك
-    'last_name'    => null,         // null = مخفي بالافتراضي
-    'middle_name'  => null,
+    'table' => 'contacts', // Your database table name
 
-    'phone_mobile' => 'phone',      // رقم الجوال — الأساسي
-    'phone_work'   => null,
-    'phone_home'   => null,
+    'columns' => [
+        'first_name'   => 'first_name',  // The column name in your table
+        'last_name'    => null,           // null = disabled by default
+        'middle_name'  => null,
 
-    'email'        => null,         // null = مخفي بالافتراضي
-],
+        'phone_mobile' => 'phone',        // Primary mobile number — required
+        'phone_work'   => null,
+        'phone_home'   => null,
+
+        'email'        => null,           // null = disabled by default
+    ],
+
+    'filename'         => 'contacts',
+    'append_count'     => true,
+    'append_date'      => false,
+    'skip_empty_phone' => true,
+    'normalize_phone'  => true,
+    'charset_utf8'     => true,
+    'chunk_size'       => 500,
+
+];
 ```
 
-> **ملاحظة:** `last_name` و `email` مخفيان بالافتراضي. المستخدم يفعّلهم عند الحاجة بـ `withLastName()` و `withEmail()`.
+> **Note:** `last_name` and `email` are disabled by default. Enable them at runtime using `withLastName()` and `withEmail()` on the `VCard` facade — no config changes needed.
 
 ---
 
-## الاستخدام
+## 🚀 Usage
 
-### أبسط حالة — يعتمد على config بالكامل
+### Simplest Case — Relies entirely on config
 
 ```php
 use VCard;
@@ -65,13 +91,13 @@ use VCard;
 public function export()
 {
     return VCard::download();
-    // ينتج: contacts_250.vcf
+    // Output: contacts_250.vcf
 }
 ```
 
 ---
 
-### مع اسم العائلة
+### With Last Name
 
 ```php
 return VCard::withLastName()->download();
@@ -79,7 +105,7 @@ return VCard::withLastName()->download();
 
 ---
 
-### مع البريد الإلكتروني
+### With Email
 
 ```php
 return VCard::withEmail()->download();
@@ -87,7 +113,7 @@ return VCard::withEmail()->download();
 
 ---
 
-### مع اسم العائلة والبريد معاً
+### With Both Last Name and Email
 
 ```php
 return VCard::withLastName()->withEmail()->download();
@@ -95,7 +121,7 @@ return VCard::withLastName()->withEmail()->download();
 
 ---
 
-### جدول مختلف عن الـ config
+### Different Table (overrides config)
 
 ```php
 return VCard::from('users')->download();
@@ -103,7 +129,7 @@ return VCard::from('users')->download();
 
 ---
 
-### تعديل أعمدة بدون تغيير config
+### Override Column Mapping (without changing config)
 
 ```php
 return VCard::map([
@@ -114,37 +140,39 @@ return VCard::map([
 
 ---
 
-### مع شروط WHERE
+### With WHERE Conditions
 
 ```php
 return VCard::where(['active' => 1])->download();
 
-// شروط متعددة
+// Multiple conditions
 return VCard::where(['active' => 1, 'country' => 'SA'])->download();
 ```
 
+> **Note:** `where()` only works when using `from()`. Do **not** combine it with `fromQuery()`.
+
 ---
 
-### من Eloquent Model مباشرة
+### From an Eloquent Model
 
 ```php
-// كل السجلات
+// All records
 return VCard::fromQuery(Contact::query())->download();
 
-// مع scope موجود في الـ Model
+// Using an existing scope on the model
 return VCard::fromQuery(Contact::active())->download();
 
-// مع شروط
+// With custom constraints
 return VCard::fromQuery(
     Contact::where('country', 'SA')->orderBy('first_name')
 )->download();
 ```
 
-> **مهم:** عند استخدام `fromQuery` لا تستخدم `where()` — أضف الشروط مباشرة في الـ query قبل التمرير.
+> **Important:** When using `fromQuery()`, apply all conditions directly to the query **before** passing it in. Do not chain `where()` on the VCard facade alongside `fromQuery()`.
 
 ---
 
-### من DB::table
+### From a `DB::table` Query
 
 ```php
 return VCard::fromQuery(
@@ -154,16 +182,16 @@ return VCard::fromQuery(
 
 ---
 
-### اسم ملف مخصص
+### Custom Filename
 
 ```php
-return VCard::download('موظفي_الشركة');
-// ينتج: موظفي_الشركة_150.vcf
+return VCard::download('company_employees');
+// Output: company_employees_150.vcf
 ```
 
 ---
 
-### التحكم الكامل
+### Full Control — All Options Combined
 
 ```php
 return VCard::fromQuery(Contact::active())
@@ -183,60 +211,64 @@ return VCard::fromQuery(Contact::active())
 
 ---
 
-## الـ Route
+## 🌐 Route Setup
+
+Register a route that triggers the export:
 
 ```php
 // routes/web.php
 Route::get('/export-contacts', [ContactController::class, 'export']);
 ```
 
-المستخدم يفتح الرابط ويبدأ تحميل الملف مباشرة.
+When a user visits the URL, the `.vcf` file download starts immediately.
 
 ---
 
-## خيارات config كاملة
+## 📋 Configuration Reference
 
-| الخيار | الوصف | الافتراضي |
-|--------|-------|-----------|
-| `table` | اسم الجدول | `contacts` |
-| `filename` | اسم الملف بدون `.vcf` | `contacts` |
-| `append_count` | يضيف عدد السجلات في الاسم | `true` |
-| `append_date` | يضيف التاريخ في الاسم | `false` |
-| `skip_empty_phone` | يتجاهل السجلات بدون هاتف | `true` |
-| `normalize_phone` | ينظف أرقام الهاتف من الرموز | `true` |
-| `charset_utf8` | دعم الأسماء العربية | `true` |
-| `chunk_size` | عدد السجلات لكل دفعة | `500` |
-
----
-
-## الـ API كاملاً
-
-| الدالة | الوصف |
-|--------|-------|
-| `from(string $table)` | تحديد الجدول |
-| `fromQuery($query)` | تمرير Eloquent أو DB query جاهز |
-| `map(array $columns)` | تعديل خريطة الأعمدة |
-| `where(array $conditions)` | إضافة شروط (مع `from` فقط) |
-| `withLastName()` | تفعيل اسم العائلة |
-| `withEmail()` | تفعيل البريد الإلكتروني |
-| `filename(string $name)` | اسم ملف مخصص |
-| `chunkSize(int $size)` | تعديل حجم الـ chunk |
-| `download(?string $filename)` | تنفيذ التصدير |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `table` | Database table name | `contacts` |
+| `filename` | Output filename without `.vcf` extension | `contacts` |
+| `append_count` | Append the total record count to the filename | `true` |
+| `append_date` | Append today's date to the filename | `false` |
+| `skip_empty_phone` | Skip records that have no phone number | `true` |
+| `normalize_phone` | Strip symbols and formatting from phone numbers | `true` |
+| `charset_utf8` | Enable UTF-8 charset for Arabic name support | `true` |
+| `chunk_size` | Number of records to process per chunk | `500` |
 
 ---
 
-## هيكل الباكج
+## 📖 API Reference
+
+| Method | Description |
+|--------|-------------|
+| `from(string $table)` | Set the database table to query |
+| `fromQuery($query)` | Pass in a ready-made Eloquent or `DB::table` query builder |
+| `map(array $columns)` | Override the column mapping at runtime |
+| `where(array $conditions)` | Add WHERE conditions (only works with `from()`) |
+| `withLastName()` | Enable the last name field |
+| `withEmail()` | Enable the email field |
+| `filename(string $name)` | Set a custom output filename |
+| `chunkSize(int $size)` | Override the chunk size for this export |
+| `download(?string $filename)` | Execute the export and stream the `.vcf` file |
+
+---
+
+## 🏗️ Package Structure
 
 ```
 src/
 ├── Support/
-│   ├── ExportConfig.php    ← data object يحمل كل الإعدادات
-│   └── ColumnMap.php       ← خريطة ربط الأعمدة
-├── VCardBuilder.php        ← يبني صيغة vCard 3.0
-├── VCardDownloader.php     ← يقرأ DB ويرسل الملف
-├── VCardExporter.php       ← fluent API
-├── Facades/VCard.php
-└── Providers/VCardServiceProvider.php
+│   ├── ExportConfig.php       ← Data object holding all resolved settings
+│   └── ColumnMap.php          ← Column mapping between config keys and DB columns
+├── VCardBuilder.php           ← Builds vCard 3.0 formatted strings
+├── VCardDownloader.php        ← Reads from DB in chunks and streams the file
+├── VCardExporter.php          ← The fluent API builder
+├── Facades/
+│   └── VCard.php              ← Laravel Facade
+└── Providers/
+    └── VCardServiceProvider.php
 
 config/
 └── vcard-exporter.php
@@ -244,23 +276,23 @@ config/
 
 ---
 
-## المتطلبات
+## 📋 Requirements
 
-| المتطلب | الإصدار |
-|---------|---------|
-| PHP | ^8.3 |
-| Laravel | ^10 \| ^11 \| ^12 |
+| Requirement | Version |
+|-------------|---------|
+| PHP | `^8.3` |
+| Laravel | `^10 \| ^11 \| ^12` |
 
 ---
 
-## الترخيص
+## 📄 License
 
-مفتوح المصدر تحت رخصة [MIT](LICENSE).
+Open source, released under the [MIT License](LICENSE).
 
 ---
 
 <div align="center">
-صُنع بـ ❤️ بواسطة <a href="https://github.com/developerabod">Developer Abod</a>
-</div>
+
+Made with ❤️ by [Developer Abod](https://github.com/developerabod)
 
 </div>
