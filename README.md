@@ -2,6 +2,11 @@
 
 # 📇 Laravel Contact Exporter
 
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/DeveloperAbod/laravel-contact-exporter/master/laravel-contact-exporter-profile.png" width="400" alt="Laravel Contact Exporter">
+
+</div>
 **A Laravel package to export database contacts as vCard (`.vcf`) files — clean, professional, and effortless.**
 
 [![PHP](https://img.shields.io/badge/PHP-%5E8.3-blue?style=flat-square&logo=php)](https://php.net)
