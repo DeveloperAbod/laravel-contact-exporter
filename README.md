@@ -52,7 +52,7 @@ Open `config/vcard-exporter.php` and map each config key to the actual column na
 ```php
 return [
 
-    'table' => 'contacts', // Your database table name
+    'table' => 'users', // Your database table name
 
     'columns' => [
         'first_name'   => 'first_name',  // The column name in your table
@@ -60,19 +60,19 @@ return [
         'middle_name'  => null,
 
         'phone_mobile' => 'phone',        // Primary mobile number — required
-        'phone_work'   => null,
-        'phone_home'   => null,
+        'phone_work'   => null,         // Optional work phone number (disabled by default)
+        'phone_home'   => null,        // Optional home phone number (disabled by default)
 
         'email'        => null,           // null = disabled by default
     ],
 
-    'filename'         => 'contacts',
-    'append_count'     => true,
-    'append_date'      => false,
-    'skip_empty_phone' => true,
+    'filename'         => 'contacts',     // Base name of the exported file (e.g. contacts.csv)
+    'append_count'     => true, // If true: appends total contact count to filename, Example:contacts_250.vcf
+    'append_date'      => false, // If true: appends export date to filename Example: contacts_2026-02-22.vcf
+    'skip_empty_phone' => true, 
     'normalize_phone'  => true,
-    'charset_utf8'     => true,
-    'chunk_size'       => 500,
+    'charset_utf8'     => true, // Enables UTF-8 encoding to support arabic
+    'chunk_size'       => 500,  // Chunk size for optimized processing
 
 ];
 ```
