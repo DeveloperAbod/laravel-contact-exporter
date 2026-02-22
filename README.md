@@ -211,19 +211,6 @@ return VCard::fromQuery(Contact::active())
 
 ---
 
-## 🌐 Route Setup
-
-Register a route that triggers the export:
-
-```php
-// routes/web.php
-Route::get('/export-contacts', [ContactController::class, 'export']);
-```
-
-When a user visits the URL, the `.vcf` file download starts immediately.
-
----
-
 ## 📋 Configuration Reference
 
 | Option | Description | Default |
